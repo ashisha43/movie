@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:movieshow/movieInfo.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'gener.dart';import 'search.dart';
+import 'gener.dart';
+import 'search.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -12,7 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Movie shape;
+  Movie movie;
   genre s;
 
   List<String> moviename=[];
@@ -45,19 +46,19 @@ class _HomeScreenState extends State<HomeScreen> {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var jsonresponce=await json.decode(response.body);
-      shape = new Movie.fromJson(jsonresponce);
-      print(shape.results.length);
-      for(int i=0;i<shape.results.length;i++){
-        await getgenapi(i,shape.results[i].searchitemid);
+      movie = new Movie.fromJson(jsonresponce);
+      print(movie.results.length);
+      for(int i=0;i<movie.results.length;i++){
+        await getgenapi(i,movie.results[i].searchitemid);
       }
       dummygenre.addAll(genrelists);
-      for(int i=0;i<shape.results.length;i++){
-        moviename.add(shape.results[i].original_title);
-        posterlink.add(shape.results[i].poster_path);
-        avgvote.add(shape.results[i].voteavg);
-        movienameiteam.add(shape.results[i].original_title);
-        posterlinkiteam.add(shape.results[i].poster_path);
-        avgvoteiteam.add(shape.results[i].voteavg);
+      for(int i=0;i<movie.results.length;i++){
+        moviename.add(movie.results[i].original_title);
+        posterlink.add(movie.results[i].poster_path);
+        avgvote.add(movie.results[i].voteavg);
+        movienameiteam.add(movie.results[i].original_title);
+        posterlinkiteam.add(movie.results[i].poster_path);
+        avgvoteiteam.add(movie.results[i].voteavg);
       }
       //setStates();
     } else {
@@ -75,32 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
       var jsonresponce=await json.decode(response.body);
       s = new genre.fromJson(jsonresponce);
       for(int i=0;i<s.rs.length;i++){
-        shape.results[index].genrename.add(s.rs[i].name);
+        movie.results[index].genrename.add(s.rs[i].name);
       }
 
-      print(shape.results[index].genrename);
+      print(movie.results[index].genrename);
       //setStates();
     } else {
       throw Exception('Failed to load data');
     }
     print(genrelists);
   }
-  List searchgen=List();
-  Future<Widget> sgetgenapi(int index,var id) async{
-    print("ID IS $id INDEX IS $index");
-    final response = await http.get("https://api.themoviedb.org/3/movie/"+id.toString()+"?api_key=bc723b59e8641c4a0add655901553849");
-    if (response.statusCode == 200) {
-      var jsonresponce=await json.decode(response.body);
-      s = new genre.fromJson(jsonresponce);
-      for(int i=0;i<shape.results.length;i++){
-        shape.results[index].genrename.add(s.rs[i].name);
-      }
-      print(genrelists);
-      //setStates();
-    } else {
-      throw Exception('Failed to load data');
-    }
-  }
+
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
@@ -186,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             Padding(
                               padding: const EdgeInsets.only(top:8.0),
-                              child: Text(ontap==true?"":shape.results[index].genrename.toString().replaceAll('[', " ").replaceAll(']', " "),
+                              child: Text(ontap==true?"":movie.results[index].genrename.toString().replaceAll('[', " ").replaceAll(']', " "),
                                 maxLines: 4,
                                 style: TextStyle(
                                     color: Colors.grey
