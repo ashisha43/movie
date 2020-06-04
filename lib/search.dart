@@ -29,10 +29,10 @@ class MovieSearchInfo{
 
 }
 class movieSearch {
-  final List<MovieSearchInfo> rs;
+  final List<MovieSearchInfo> result;
 
   movieSearch({
-    this.rs,
+    this.result,
 
   });
   factory  movieSearch.fromJson(Map<String, dynamic> parsedJson) {
@@ -40,7 +40,7 @@ class movieSearch {
 
     List<MovieSearchInfo> indialist = list.map((i) => MovieSearchInfo.fromJson(i)).toList();
     return movieSearch(
-      rs: indialist,
+      result: indialist,
     );
   }
 }

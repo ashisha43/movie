@@ -13,6 +13,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Movie shape;
+  genre s;
+
   List<String> moviename=[];
   List<double> avgvote=[];
   List<String> posterlink=[];
@@ -21,40 +23,41 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> movienameiteam=[];
   List<double> avgvoteiteam=[];
   List<String> posterlinkiteam=[];
-  ScrollController _scrollController=ScrollController();
-  var imageurl="http://image.tmdb.org/t/p/w185//";
+
   List <List> genrelists=List();
   List <List> dummygenre=List();
-  bool ontap=false;
-  var searchurl="https://api.themoviedb.org/3/search/multi?api_key=b1d0f6fbc8e10c5a4982776c6073f1c9";
-  var gettvshowurl="https://api.themoviedb.org/3/tv/73411?api_key=b1d0f6fbc8e10c5a4982776c6073f1c9&language=en-US";
-  var gettoprated="https://api.themoviedb.org/3/movie/top_rated?api_key=b1d0f6fbc8e10c5a4982776c6073f1c9&language=en-US";
-  genre s;
 
+  ScrollController _scrollController=ScrollController();
+
+  var imageurl="http://image.tmdb.org/t/p/w185//";
+  var gettoprated="https://api.themoviedb.org/3/movie/top_rated?api_key=b1d0f6fbc8e10c5a4982776c6073f1c9&language=en-US";
+
+  bool ontap=false;
   bool loading=true;
+
   @override
   void initState() {
-    // Navigator.push(context,MaterialPageRoute(builder: (context) => ChoiceDistrict()));
     getapi(gettoprated);
     super.initState();
   }
+
   void getapi (var url)async{
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var jsonresponce=await json.decode(response.body);
       shape = new Movie.fromJson(jsonresponce);
-      print(shape.rs.length);
-      for(int i=0;i<shape.rs.length;i++){
-        await getgenapi(i,shape.rs[i].searchitemid);
+      print(shape.results.length);
+      for(int i=0;i<shape.results.length;i++){
+        await getgenapi(i,shape.results[i].searchitemid);
       }
       dummygenre.addAll(genrelists);
-      for(int i=0;i<shape.rs.length;i++){
-        moviename.add(shape.rs[i].original_title);
-        posterlink.add(shape.rs[i].poster_path);
-        avgvote.add(shape.rs[i].voteavg);
-        movienameiteam.add(shape.rs[i].original_title);
-        posterlinkiteam.add(shape.rs[i].poster_path);
-        avgvoteiteam.add(shape.rs[i].voteavg);
+      for(int i=0;i<shape.results.length;i++){
+        moviename.add(shape.results[i].original_title);
+        posterlink.add(shape.results[i].poster_path);
+        avgvote.add(shape.results[i].voteavg);
+        movienameiteam.add(shape.results[i].original_title);
+        posterlinkiteam.add(shape.results[i].poster_path);
+        avgvoteiteam.add(shape.results[i].voteavg);
       }
       //setStates();
     } else {
@@ -72,10 +75,10 @@ class _HomeScreenState extends State<HomeScreen> {
       var jsonresponce=await json.decode(response.body);
       s = new genre.fromJson(jsonresponce);
       for(int i=0;i<s.rs.length;i++){
-        shape.rs[index].genrename.add(s.rs[i].name);
+        shape.results[index].genrename.add(s.rs[i].name);
       }
 
-      print(shape.rs[index].genrename);
+      print(shape.results[index].genrename);
       //setStates();
     } else {
       throw Exception('Failed to load data');
@@ -89,8 +92,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (response.statusCode == 200) {
       var jsonresponce=await json.decode(response.body);
       s = new genre.fromJson(jsonresponce);
-      for(int i=0;i<shape.rs.length;i++){
-        shape.rs[index].genrename.add(s.rs[i].name);
+      for(int i=0;i<shape.results.length;i++){
+        shape.results[index].genrename.add(s.rs[i].name);
       }
       print(genrelists);
       //setStates();
@@ -183,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             Padding(
                               padding: const EdgeInsets.only(top:8.0),
-                              child: Text(ontap==true?"":shape.rs[index].genrename.toString().replaceAll('[', " ").replaceAll(']', " "),
+                              child: Text(ontap==true?"":shape.results[index].genrename.toString().replaceAll('[', " ").replaceAll(']', " "),
                                 maxLines: 4,
                                 style: TextStyle(
                                     color: Colors.grey
@@ -263,10 +266,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   void searchlist(String query) async{
     String searchkey="https://api.themoviedb.org/3/search/multi?api_key=b1d0f6fbc8e10c5a4982776c6073f1c9&language=en-US&query="+query+"&include_adult=false";
-    print(searchkey);
 
     int i=0;
-    //String takequery= query.isNotEmpty?('${query[0].toUpperCase()}${query.substring(1)}'):null;
     print(query);
     List<String> dummydistListmoviename = [];
     List<double> dummydistListavgvote = [];
@@ -275,6 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
     dummydistListmoviename.addAll(moviename);
     dummydistListavgvote.addAll(avgvote);
     dummydistListposterlink.addAll(posterlink);
+
     if (query.isNotEmpty) {
       List<String> dummymoviename = [];
       List<double> dummyvote = [];
@@ -287,19 +289,19 @@ class _HomeScreenState extends State<HomeScreen> {
           });
           var jsonresponce=await json.decode(response.body);
           movieSearch ms = new movieSearch.fromJson(jsonresponce);
-          print(ms.rs.length);
-          print(ms.rs[i].vote_average.runtimeType);
-          for(int i=0;i<ms.rs.length;i++) {
-            print(ms.rs[i].original_title);
-            if (ms.rs[i].original_title.toString() =='null' || ms.rs[i].poster_path==null || ms.rs[i].vote_average==null) {
+          print(ms.result.length);
+          print(ms.result[i].vote_average.runtimeType);
+          for(int i=0;i<ms.result.length;i++) {
+            print(ms.result[i].original_title);
+            if (ms.result[i].original_title.toString() =='null' || ms.result[i].poster_path==null || ms.result[i].vote_average==null) {
               print("NULL SLIPPPING");
               continue;
             }
             else{
-              print(ms.rs[i].vote_average.runtimeType);
-              dummymoviename.add(ms.rs[i].original_title);
-              dummyposterlink.add(ms.rs[i].poster_path);
-              dummyvote.add(ms.rs[i].vote_average);
+              print(ms.result[i].vote_average.runtimeType);
+              dummymoviename.add(ms.result[i].original_title);
+              dummyposterlink.add(ms.result[i].poster_path);
+              dummyvote.add(ms.result[i].vote_average);
             }
           }}}
       catch(e){

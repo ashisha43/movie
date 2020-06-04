@@ -34,17 +34,17 @@ class MovieInfo{
 
 }
 class Movie {
-  final List<MovieInfo> rs;
+  final List<MovieInfo> results;
 
   Movie({
-    this.rs,
+    this.results,
   });
   factory  Movie.fromJson(Map<String, dynamic> parsedJson) {
     var list = parsedJson['results'] as List;
 
-   List<MovieInfo> indialist = list.map((i) => MovieInfo.fromJson(i)).toList();
+   List<MovieInfo> mlist = list.map((i) => MovieInfo.fromJson(i)).toList();
     return Movie(
-        rs: indialist,
+        results: mlist,
 
     );
 
